@@ -21,6 +21,20 @@ interface BatchPermissionRequest {
 }
 
 /**
+ * Impact analysis for a single user
+ */
+interface UserImpact {
+  userId: string
+  email: string
+  currentRole: string
+  newRole?: string
+  permissionsAdded: Permission[]
+  permissionsRemoved: Permission[]
+  riskLevel: 'low' | 'medium' | 'high' | 'critical'
+  conflicts: string[]
+}
+
+/**
  * Response type for batch permission update
  */
 interface BatchPermissionResponse {
@@ -33,6 +47,17 @@ interface BatchPermissionResponse {
   }
   warnings?: Array<{ message: string }>
   conflicts?: Array<{ message: string }>
+  impactAnalysis?: {
+    totalUsersAffected: number
+    riskBreakdown: {
+      critical: number
+      high: number
+      medium: number
+      low: number
+    }
+    userImpacts: UserImpact[]
+    summary: string
+  }
   message?: string
   error?: string
   details?: ValidationError[]
