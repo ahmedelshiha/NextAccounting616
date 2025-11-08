@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, Suspense, lazy } from 'react'
 import { TabNavigation, TabType } from './components/TabNavigation'
+import ExecutiveDashboardTabWrapper from './components/ExecutiveDashboardTabWrapper'
 import {
-  ExecutiveDashboardTab,
   RbacTab
 } from './components/tabs'
 import { CreateUserModal } from '@/components/admin/shared/CreateUserModal'
@@ -77,7 +77,7 @@ export function EnterpriseUsersPage() {
       tab: activeTab,
       users: Array.isArray(context.users) ? context.users.length : 0,
     })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [activeTab, context.users?.length])
 
   // Handler for Add User action
@@ -198,16 +198,7 @@ export function EnterpriseUsersPage() {
             )}
           >
             <Suspense fallback={<DashboardTabSkeleton />}>
-              <ExecutiveDashboardTab
-                users={context.users}
-                stats={context.stats}
-                isLoading={context.usersLoading || context.isLoading}
-                onAddUser={handleAddUser}
-                onImport={handleImport}
-                onBulkOperation={handleBulkOperation}
-                onExport={handleExport}
-                onRefresh={handleRefresh}
-              />
+              <ExecutiveDashboardTabWrapper />
             </Suspense>
           </ErrorBoundary>
         )}

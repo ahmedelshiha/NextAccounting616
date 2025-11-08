@@ -198,8 +198,8 @@ export const UsersTable = memo(function UsersTable({
   )
 
   return (
-    <Card>
-      <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 space-y-0">
+    <Card className="flex flex-col h-full">
+      <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 space-y-0 flex-shrink-0">
         <div className="space-y-1 min-w-0">
           <CardTitle className="text-xl sm:text-2xl">User Directory</CardTitle>
           <CardDescription className="text-xs sm:text-sm">Search, filter and manage users</CardDescription>
@@ -219,10 +219,10 @@ export const UsersTable = memo(function UsersTable({
           </div>
         )}
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex-1 overflow-hidden p-0">
         {isLoading ? (
-          <div className="max-h-[60vh] space-y-2" role="status" aria-label="Loading users">
-            {Array.from({ length: 5 }).map((_, i) => (
+          <div className="h-full space-y-2 overflow-auto px-6 py-4" role="status" aria-label="Loading users">
+            {Array.from({ length: 8 }).map((_, i) => (
               <UserRowSkeleton key={i} />
             ))}
           </div>
@@ -231,19 +231,20 @@ export const UsersTable = memo(function UsersTable({
             role="grid"
             aria-label="User directory table"
             aria-rowcount={users.length}
+            className="h-full overflow-hidden"
           >
             <VirtualScroller
               items={users}
               itemHeight={96}
-              maxHeight="60vh"
+              maxHeight="100%"
               renderItem={(user) => renderUserRow(user)}
               overscan={5}
               getKey={(user) => user.id}
-              className="pr-1"
+              className="h-full"
             />
           </div>
         ) : (
-          <div className="h-[60vh] flex items-center justify-center text-gray-500 text-sm" role="status">
+          <div className="h-full flex items-center justify-center text-gray-500 text-sm" role="status">
             No users found matching your criteria.
           </div>
         )}
