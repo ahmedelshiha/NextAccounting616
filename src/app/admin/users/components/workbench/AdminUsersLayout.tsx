@@ -74,12 +74,50 @@ export default function AdminUsersLayout() {
   }
 
   const handleExport = async () => {
-    console.log('Export clicked')
+    const toastId = toast.loading('Preparing export...')
     try {
-      toast.success('Export feature coming soon')
+      // Build CSV headers
+      const headers = ['ID', 'Name', 'Email', 'Role', 'Status', 'Created At', 'Last Login']
+
+      // Build CSV rows
+      const rows = (Array.isArray(context.users) ? context.users : []).map(user => [
+        user.id,
+        user.name || '',
+        user.email,
+        user.role,
+        user.status || 'ACTIVE',
+        new Date(user.createdAt).toLocaleDateString(),
+        user.updatedAt ? new Date(user.updatedAt).toLocaleDateString() : 'Never'
+      ])
+
+      // Create CSV content with proper escaping
+      const csvContent = [
+        headers.join(','),
+        ...rows.map(row => row.map(cell => {
+          const value = String(cell || '')
+          return value.includes(',') || value.includes('"') ? `"${value.replace(/"/g, '""')}"` : value
+        }).join(','))
+      ].join('\n')
+
+      // Create and trigger download
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+      const link = document.createElement('a')
+      const url = URL.createObjectURL(blob)
+
+      link.setAttribute('href', url)
+      link.setAttribute('download', `users-export-${new Date().toISOString().split('T')[0]}.csv`)
+      link.style.visibility = 'hidden'
+
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      toast.dismiss(toastId)
+      toast.success(`Exported ${context.users.length} users successfully`)
     } catch (error) {
-      toast.error('Failed to export users')
       console.error('Export error:', error)
+      toast.dismiss(toastId)
+      toast.error('Failed to export users')
     }
   }
 
