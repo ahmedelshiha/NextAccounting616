@@ -149,7 +149,7 @@ export function VirtualScroller<T>({
     <div
       ref={containerRef}
       className={`overflow-y-auto ${className}`}
-      style={{ maxHeight: maxHeightPx }}
+      style={{ maxHeight: maxHeightPx > 0 ? maxHeightPx : 'auto' }}
       onScroll={handleScroll}
       role="listbox"
       tabIndex={0}
