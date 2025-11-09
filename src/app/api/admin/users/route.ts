@@ -5,6 +5,7 @@ import prisma from '@/lib/prisma'
 import { respond } from '@/lib/api-response'
 import { hasPermission, PERMISSIONS } from '@/lib/permissions'
 import { createHash } from 'crypto'
+import bcrypt from 'bcryptjs'
 import { applyRateLimit, getClientIp } from '@/lib/rate-limit'
 import { tenantFilter } from '@/lib/tenant'
 import { AuditLogService } from '@/services/audit-log.service'
@@ -299,12 +300,15 @@ export const POST = withTenantContext(async (request: NextRequest) => {
       return respond.conflict('User with this email already exists')
     }
 
+    // Hash password before storing in database
+    const hashedPassword = password ? await bcrypt.hash(password, 12) : undefined
+
     const newUser = await prisma.user.create({
       data: {
         name,
         email,
         role,
-        password,
+        password: hashedPassword,
         tenantId
       }
     })
@@ -360,13 +364,16 @@ export const PUT = withTenantContext(async (request: NextRequest) => {
       return respond.notFound('User not found')
     }
 
+    // Hash password before storing in database
+    const hashedPassword = password ? await bcrypt.hash(password, 12) : undefined
+
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: {
         name,
         email,
         role,
-        password
+        ...(hashedPassword ? { password: hashedPassword } : {})
       }
     })
 
