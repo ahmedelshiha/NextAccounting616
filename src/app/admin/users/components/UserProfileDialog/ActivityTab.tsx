@@ -193,7 +193,7 @@ export const ActivityTab = memo(function ActivityTab({ userId }: ActivityTabProp
         </Button>
       </div>
 
-      {activity.map((log: ActivityLog) => (
+      {(activity as unknown as ActivityLog[]).map((log: ActivityLog) => (
         <div
           key={log.id}
           className="border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors hover:shadow-sm overflow-hidden"
