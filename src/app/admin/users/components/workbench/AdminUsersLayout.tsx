@@ -8,6 +8,7 @@ import OverviewCards from './OverviewCards'
 import AdminSidebar from './AdminSidebar'
 import UserDirectorySection from './UserDirectorySection'
 import BulkActionsPanel from './BulkActionsPanel'
+import InlineCreateUser from './InlineCreateUser'
 import { BuilderHeaderSlot, BuilderMetricsSlot, BuilderSidebarSlot, BuilderFooterSlot } from './BuilderSlots'
 import { useIsBuilderEnabled } from '@/hooks/useIsBuilderEnabled'
 import { useUsersContext } from '../../contexts/UsersContextProvider'
@@ -24,7 +25,7 @@ import '../styles/admin-users-layout.css'
  * ├──────────────┬─────────────────��───────������─┤
  * │              │                            │
  * │   Sidebar    │     Main Content Area      │
- * │  (Analytics  │   ┌──────────────────��    │
+ * ���  (Analytics  │   ┌──────────────────��    │
  * │  + Filters)  │   │   OverviewCards  │    │
  * │              │   ├──────────────────┤    │
  * │              ���   │   DirectoryHead  │    │
@@ -47,6 +48,7 @@ export default function AdminUsersLayout() {
   const [filters, setFilters] = useState<Record<string, any>>({})
   const [showImportWizard, setShowImportWizard] = useState(false)
   const [showCreateUserModal, setShowCreateUserModal] = useState(false)
+  const [showCreateUserInline, setShowCreateUserInline] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const isBuilderEnabled = useIsBuilderEnabled()
   const context = useUsersContext()
@@ -58,8 +60,8 @@ export default function AdminUsersLayout() {
   }
 
   const handleAddUser = () => {
-    console.log('Add User clicked')
-    setShowCreateUserModal(true)
+    setShowCreateUserModal(false)
+    setShowCreateUserInline(true)
   }
 
   const handleUserCreated = (userId: string) => {
@@ -181,19 +183,32 @@ export default function AdminUsersLayout() {
 
         {/* Main Content */}
         <main className="admin-workbench-content" data-testid="admin-main-content">
-          {/* KPI Metric Cards - Builder.io slot with fallback */}
-          <div className="admin-workbench-metrics">
-            {isBuilderEnabled ? <BuilderMetricsSlot /> : <OverviewCards />}
-          </div>
-
-          {/* User Directory Section */}
-          <div className="admin-workbench-directory">
-            <UserDirectorySection
-              selectedUserIds={selectedUserIds}
-              onSelectionChange={setSelectedUserIds}
-              filters={filters}
+          {showCreateUserInline ? (
+            <InlineCreateUser
+              onBack={() => setShowCreateUserInline(false)}
+              onSuccess={(id: string) => {
+                toast.success('User created successfully')
+                setShowCreateUserInline(false)
+                context.refreshUsers?.()
+              }}
             />
-          </div>
+          ) : (
+            <>
+              {/* KPI Metric Cards - Builder.io slot with fallback */}
+              <div className="admin-workbench-metrics">
+                {isBuilderEnabled ? <BuilderMetricsSlot /> : <OverviewCards />}
+              </div>
+
+              {/* User Directory Section */}
+              <div className="admin-workbench-directory">
+                <UserDirectorySection
+                  selectedUserIds={selectedUserIds}
+                  onSelectionChange={setSelectedUserIds}
+                  filters={filters}
+                />
+              </div>
+            </>
+          )}
         </main>
       </div>
 
