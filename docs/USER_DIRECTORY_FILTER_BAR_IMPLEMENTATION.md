@@ -52,11 +52,32 @@ See: [PHASE_6_FILTER_PRESETS_AND_QUICK_FILTERS.md](./PHASE_6_FILTER_PRESETS_AND_
 - Relative timestamp display
 - Side panel UI for management
 
+### Phase 7: Advanced Query Builder (v2.0) ✅
+See: [PHASE_7_ADVANCED_QUERY_BUILDER.md](./PHASE_7_ADVANCED_QUERY_BUILDER.md)
+
+**Completed Features:**
+- Visual query builder component with AND/OR logic
+- Advanced filter operators (NOT, BETWEEN, IN, NOT IN, etc.)
+- Support for nested condition groups
+- Filter templates system with save/load/delete
+- Built-in template library (Active Users, Inactive, Admins, Team Members)
+- Template import/export (JSON format)
+- Template manager UI with search and categorization
+- Integration with existing filter bar
+- Full TypeScript typing
+
+**New Files Created:**
+- `src/app/admin/users/types/query-builder.ts` - Type definitions
+- `src/app/admin/users/hooks/useQueryBuilder.ts` - Query builder state management
+- `src/app/admin/users/hooks/useFilterTemplates.ts` - Template management hook
+- `src/app/admin/users/components/AdvancedQueryBuilder.tsx` - Query builder UI
+- `src/app/admin/users/components/QueryTemplateManager.tsx` - Template manager UI
+
 ---
 
 ## ⏳ PENDING PHASES
 
-### Phase 7: Advanced Query Builder (v2.0)
+### Phase 8: Filter History & Tracking (v2.0)
 **Status:** Pending  
 **Estimated Effort:** 4-6 hours  
 **Priority:** High  
