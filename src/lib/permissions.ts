@@ -98,6 +98,16 @@ export const PERMISSIONS = {
   // Language management
   LANGUAGES_VIEW: 'languages.view',
   LANGUAGES_MANAGE: 'languages.manage',
+
+  // Reports management
+  REPORTS_CREATE: 'reports.create',
+  REPORTS_READ: 'reports.read',
+  REPORTS_WRITE: 'reports.write',
+  REPORTS_DELETE: 'reports.delete',
+  REPORTS_GENERATE: 'reports.generate',
+
+  // Advanced exports
+  USERS_EXPORT: 'users.export',
 } as const
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS]
@@ -303,6 +313,15 @@ export const PERMISSION_METADATA: Record<Permission, PermissionMetadata> = {
     risk: RiskLevel.LOW,
     icon: 'User',
     tags: ['users', 'view', 'rbac'],
+  },
+  [PERMISSIONS.USERS_EXPORT]: {
+    key: PERMISSIONS.USERS_EXPORT,
+    label: 'Export Users',
+    description: 'Export user data to CSV, Excel, PDF, and other formats',
+    category: PermissionCategory.CONTENT,
+    risk: RiskLevel.LOW,
+    icon: 'Download',
+    tags: ['users', 'export', 'reports', 'data'],
   },
 
   // Analytics & Reporting
@@ -847,6 +866,56 @@ export const PERMISSION_METADATA: Record<Permission, PermissionMetadata> = {
     dependencies: [PERMISSIONS.LANGUAGES_VIEW],
     icon: 'Globe',
     tags: ['languages', 'localization', 'manage'],
+  },
+
+  // Reports Management
+  [PERMISSIONS.REPORTS_CREATE]: {
+    key: PERMISSIONS.REPORTS_CREATE,
+    label: 'Create Reports',
+    description: 'Create new custom reports',
+    category: PermissionCategory.ANALYTICS,
+    risk: RiskLevel.LOW,
+    icon: 'PlusSquare',
+    tags: ['reports', 'create', 'analytics'],
+  },
+  [PERMISSIONS.REPORTS_READ]: {
+    key: PERMISSIONS.REPORTS_READ,
+    label: 'View Reports',
+    description: 'View existing reports and report templates',
+    category: PermissionCategory.ANALYTICS,
+    risk: RiskLevel.LOW,
+    icon: 'Eye',
+    tags: ['reports', 'view', 'analytics'],
+  },
+  [PERMISSIONS.REPORTS_WRITE]: {
+    key: PERMISSIONS.REPORTS_WRITE,
+    label: 'Edit Reports',
+    description: 'Edit and modify existing reports',
+    category: PermissionCategory.ANALYTICS,
+    risk: RiskLevel.MEDIUM,
+    dependencies: [PERMISSIONS.REPORTS_READ],
+    icon: 'Edit',
+    tags: ['reports', 'edit', 'analytics'],
+  },
+  [PERMISSIONS.REPORTS_DELETE]: {
+    key: PERMISSIONS.REPORTS_DELETE,
+    label: 'Delete Reports',
+    description: 'Delete reports and report templates',
+    category: PermissionCategory.ANALYTICS,
+    risk: RiskLevel.HIGH,
+    dependencies: [PERMISSIONS.REPORTS_READ],
+    icon: 'Trash',
+    tags: ['reports', 'delete', 'analytics'],
+  },
+  [PERMISSIONS.REPORTS_GENERATE]: {
+    key: PERMISSIONS.REPORTS_GENERATE,
+    label: 'Generate Reports',
+    description: 'Generate and export reports in various formats',
+    category: PermissionCategory.ANALYTICS,
+    risk: RiskLevel.LOW,
+    dependencies: [PERMISSIONS.REPORTS_READ],
+    icon: 'Download',
+    tags: ['reports', 'generate', 'export', 'analytics'],
   },
 }
 
