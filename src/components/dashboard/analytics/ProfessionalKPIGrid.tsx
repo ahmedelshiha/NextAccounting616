@@ -201,9 +201,9 @@ export default function ProfessionalKPIGrid({ stats }: KPIStatsProps) {
                     </div>
                   )}
 
-                  <div className="mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div className="flex items-center text-xs text-blue-600">
-                      View details <ExternalLink className="h-3 w-3 ml-1" />
+                  <div className="mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center text-xs text-blue-600 gap-1">
+                      View details <ExternalLink className="h-3 w-3" />
                     </div>
                   </div>
                 </div>
