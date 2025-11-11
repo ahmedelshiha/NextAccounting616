@@ -232,6 +232,7 @@ export function AISearchBar({
                   className="w-full px-4 py-2 text-left text-sm hover:bg-blue-50 border-b border-gray-100 transition-colors"
                   type="button"
                   role="option"
+                  aria-selected="false"
                 >
                   <Sparkles size={14} className="inline mr-2 text-blue-600" />
                   {relatedQuery}
@@ -253,6 +254,7 @@ export function AISearchBar({
                   className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 border-b border-gray-100 transition-colors text-gray-700"
                   type="button"
                   role="option"
+                  aria-selected="false"
                 >
                   {historyQuery}
                 </button>
