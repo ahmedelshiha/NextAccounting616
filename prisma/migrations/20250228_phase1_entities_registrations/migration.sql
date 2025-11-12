@@ -179,8 +179,8 @@ CREATE TABLE IF NOT EXISTS "verification_attempts" (
   "metadata" JSONB,
   "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-  CONSTRAINT "verification_attempts_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "Tenant"("id") ON DELETE CASCADE,
-  CONSTRAINT "verification_attempts_attemptedBy_fkey" FOREIGN KEY ("attemptedBy") REFERENCES "User"("id") ON DELETE SET NULL
+  CONSTRAINT "verification_attempts_tenantId_fkey" FOREIGN KEY ("tenantId") REFERENCES "tenants"("id") ON DELETE CASCADE,
+  CONSTRAINT "verification_attempts_attemptedBy_fkey" FOREIGN KEY ("attemptedBy") REFERENCES "users"("id") ON DELETE SET NULL
 );
 
 CREATE INDEX "verification_attempts_tenantId_idx" ON "verification_attempts"("tenantId");
