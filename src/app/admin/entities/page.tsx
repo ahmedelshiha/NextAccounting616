@@ -6,7 +6,7 @@ import useSWR from "swr";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Search, ChevronRight, AlertCircle } from "lucide-react";
-import { DataTable } from "@/components/dashboard/DataTable";
+import DataTable from "@/components/dashboard/DataTable";
 import { PermissionGate } from "@/components/PermissionGate";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { logger } from "@/lib/logger";
