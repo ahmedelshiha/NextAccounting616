@@ -390,10 +390,11 @@ describe('Portal RBAC System', () => {
       expect(hasPermission('VIEWER', 'messaging.create')).toBe(false)
     })
 
-    it('should allow support access for CLIENT_OWNER and FINANCE_MANAGER', () => {
+    it('should allow support access for appropriate roles', () => {
       expect(hasPermission('CLIENT_OWNER', 'support.access')).toBe(true)
-      expect(hasPermission('FINANCE_MANAGER', 'support.access')).toBe(true)
+      expect(hasPermission('FINANCE_MANAGER', 'support.access')).toBe(false) // FM doesn't have support access
       expect(hasPermission('ACCOUNTANT', 'support.access')).toBe(false)
+      expect(hasPermission('VIEWER', 'support.access')).toBe(false)
     })
   })
 
