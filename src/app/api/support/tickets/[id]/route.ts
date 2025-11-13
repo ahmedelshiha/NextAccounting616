@@ -23,7 +23,7 @@ export const GET = withTenantContext(
       const { id } = params
 
       const ticket = await prisma.supportTicket.findFirst({
-        where: { id, tenantId },
+        where: { id, tenantId: tenantId! },
         include: {
           user: { select: { id: true, email: true, name: true } },
           assignedTo: { select: { id: true, email: true, name: true } },
@@ -60,7 +60,7 @@ export const PATCH = withTenantContext(
       const validated = UpdateTicketSchema.parse(body)
 
       const ticket = await prisma.supportTicket.findFirst({
-        where: { id, tenantId },
+        where: { id, tenantId: tenantId! },
       })
 
       if (!ticket) {
@@ -100,7 +100,7 @@ export const DELETE = withTenantContext(
       const { id } = params
 
       const ticket = await prisma.supportTicket.findFirst({
-        where: { id, tenantId },
+        where: { id, tenantId: tenantId! },
       })
 
       if (!ticket) {
