@@ -3,8 +3,12 @@ import { z } from 'zod'
 /**
  * User Preferences Schema and Types
  * Covers timezone, language, and notification preferences
+ *
+ * IMPORTANT: PreferencesSchema uses hardcoded language enum for backward compatibility.
+ * For dynamic language validation, use createPreferencesSchema() factory function.
  */
 
+// Fallback hardcoded schema (used when language registry unavailable)
 export const PreferencesSchema = z.object({
   timezone: z.string().min(1).max(100).default('UTC'),
   preferredLanguage: z.enum(['en', 'ar', 'hi']).default('en'),
@@ -18,6 +22,34 @@ export const PreferencesSchema = z.object({
 })
 
 export type UserPreferences = z.infer<typeof PreferencesSchema>
+
+/**
+ * Factory function to create PreferencesSchema with dynamic language codes
+ * Use this when you have access to the language registry (async context)
+ *
+ * @param enabledLanguages - Array of enabled language codes from language registry
+ * @returns Zod schema with dynamic language enum
+ */
+export function createPreferencesSchema(enabledLanguages: string[]) {
+  if (enabledLanguages.length === 0) {
+    console.warn('createPreferencesSchema called with no enabled languages, using fallback')
+    return PreferencesSchema
+  }
+
+  return z.object({
+    timezone: z.string().min(1).max(100).default('UTC'),
+    preferredLanguage: z
+      .enum(enabledLanguages as [string, ...string[]])
+      .default(enabledLanguages[0] || 'en'),
+    bookingEmailConfirm: z.boolean().default(true),
+    bookingEmailReminder: z.boolean().default(true),
+    bookingEmailReschedule: z.boolean().default(true),
+    bookingEmailCancellation: z.boolean().default(true),
+    bookingSmsReminder: z.boolean().default(false),
+    bookingSmsConfirmation: z.boolean().default(false),
+    reminderHours: z.array(z.number().min(1).max(720)).default([24, 2]),
+  })
+}
 
 /**
  * User Profile Schema and Types
@@ -129,14 +161,88 @@ export const ReminderConfigSchema = z.object({
 export type ReminderConfig = z.infer<typeof ReminderConfigSchema>
 
 /**
+ * Type-safe factory functions for complex Zod schema defaults
+ * These ensure proper type inference for array and union types
+ */
+
+function createEmailSettings(): z.infer<typeof EmailSettingsSchema> {
+  return {
+    transactionalEnabled: true,
+    marketingEnabled: false,
+    complianceBccEnabled: false,
+  }
+}
+
+function createSmsSettings(): z.infer<typeof SmsSettingsSchema> {
+  return {
+    provider: 'none' as 'none' | 'twilio' | 'plivo' | 'nexmo' | 'messagebird',
+    transactionalEnabled: false,
+    marketingEnabled: false,
+    fallbackToEmail: true,
+  }
+}
+
+function createLiveChatSettings(): z.infer<typeof LiveChatSettingsSchema> {
+  return {
+    enabled: false,
+    provider: 'none' as 'none' | 'intercom' | 'drift' | 'zendesk' | 'livechat',
+    routing: 'round_robin' as 'round_robin' | 'least_busy' | 'first_available' | 'manual',
+    workingHoursTimezone: 'UTC',
+    escalationEmails: [],
+  }
+}
+
+function createNotificationDigest(): z.infer<typeof NotificationDigestSchema> {
+  return {
+    timezone: 'UTC',
+  }
+}
+
+function createNewslettersSettings(): z.infer<typeof NewslettersSettingsSchema> {
+  return {
+    enabled: false,
+    doubleOptIn: true,
+    topics: [],
+  }
+}
+
+function createReminderConfig(): z.infer<typeof ReminderConfigSchema> {
+  return {
+    enabled: true,
+    offsetHours: 24,
+    channels: ['email'] as ('email' | 'sms' | 'push')[],
+  }
+}
+
+function createRemindersSettings(): z.infer<typeof RemindersSettingsSchema> {
+  return {
+    bookings: {
+      enabled: true,
+      offsetHours: 24,
+      channels: ['email'] as ('email' | 'sms' | 'push')[],
+    },
+    invoices: {
+      enabled: true,
+      offsetHours: 24,
+      channels: ['email'] as ('email' | 'sms' | 'push')[],
+    },
+    tasks: {
+      enabled: true,
+      offsetHours: 24,
+      channels: ['email'] as ('email' | 'sms' | 'push')[],
+    },
+  }
+}
+
+/**
  * Reminders Settings Schema
  * Admin-only reminders configuration for bookings, invoices, tasks
  */
 
 export const RemindersSettingsSchema = z.object({
-  bookings: ReminderConfigSchema.default({}),
-  invoices: ReminderConfigSchema.default({}),
-  tasks: ReminderConfigSchema.default({}),
+  bookings: ReminderConfigSchema,
+  invoices: ReminderConfigSchema,
+  tasks: ReminderConfigSchema,
 })
 
 export type RemindersSettings = z.infer<typeof RemindersSettingsSchema>
@@ -147,12 +253,12 @@ export type RemindersSettings = z.infer<typeof RemindersSettingsSchema>
  */
 
 export const CommunicationSettingsSchema = z.object({
-  email: EmailSettingsSchema.default({}),
-  sms: SmsSettingsSchema.default({}),
-  liveChat: LiveChatSettingsSchema.default({}),
-  notificationDigest: NotificationDigestSchema.default({}),
-  newsletters: NewslettersSettingsSchema.default({}),
-  reminders: RemindersSettingsSchema.default({}),
+  email: EmailSettingsSchema.default(createEmailSettings),
+  sms: SmsSettingsSchema.default(createSmsSettings),
+  liveChat: LiveChatSettingsSchema.default(createLiveChatSettings),
+  notificationDigest: NotificationDigestSchema.default(createNotificationDigest),
+  newsletters: NewslettersSettingsSchema.default(createNewslettersSettings),
+  reminders: RemindersSettingsSchema.default(createRemindersSettings),
 })
 
 export type CommunicationSettings = z.infer<typeof CommunicationSettingsSchema>
