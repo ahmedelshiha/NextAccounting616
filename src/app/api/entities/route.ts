@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { withTenantContext } from "@/lib/api-wrapper";
 import { requireTenantContext } from "@/lib/tenant-utils";
 import { entityService } from "@/services/entities";
@@ -35,8 +36,9 @@ const _api_GET = async (request: NextRequest) => {
   try {
     const ctx = requireTenantContext();
     const userId = ctx.userId;
+    const tenantId = ctx.tenantId;
 
-    if (!userId) {
+    if (!userId || !tenantId) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -52,7 +54,7 @@ const _api_GET = async (request: NextRequest) => {
       take: searchParams.get("take") ? parseInt(searchParams.get("take")!) : 50,
     };
 
-    const entities = await entityService.listEntities(ctx.tenantId!, filters as any);
+    const entities = await entityService.listEntities(tenantId, filters as any);
 
     return NextResponse.json({
       success: true,
@@ -75,8 +77,9 @@ const _api_POST = async (request: NextRequest) => {
   try {
     const ctx = requireTenantContext();
     const userId = ctx.userId;
+    const tenantId = ctx.tenantId;
 
-    if (!userId) {
+    if (!userId || !tenantId) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }
@@ -90,7 +93,7 @@ const _api_POST = async (request: NextRequest) => {
 
     // Create entity
     const entity = await entityService.createEntity(
-      ctx.tenantId!,
+      tenantId,
       userId,
       {
         ...input,
