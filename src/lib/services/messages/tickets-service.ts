@@ -279,13 +279,14 @@ export class TicketsService {
 
     return {
       ...ticket,
+      category: ticket.category as TicketCategory,
       createdAt: ticket.createdAt.toISOString(),
       updatedAt: ticket.updatedAt.toISOString(),
       resolvedAt: ticket.resolvedAt?.toISOString() || null,
       dueAt: ticket.dueAt?.toISOString() || null,
       slaFirstResponseAt: ticket.slaFirstResponseAt?.toISOString() || null,
       slaResolutionAt: ticket.slaResolutionAt?.toISOString() || null,
-    };
+    } as SupportTicket;
   }
 
   /**
