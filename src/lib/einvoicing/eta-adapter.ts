@@ -162,13 +162,31 @@ export class ETAAdapter implements EInvoicingProvider {
 
   /**
    * Submit invoice to ETA
+   *
+   * PRODUCTION NOTE: This is a mock implementation. Integration with actual ETA API
+   * requires:
+   * - Valid ETA API credentials and client ID
+   * - Proper certificate management for digital signatures
+   * - Compliance with Egyptian e-invoicing regulations
+   * - Error handling for ETA-specific validation and status codes
    */
   async submit(invoice: ETAInvoice): Promise<SubmissionResult> {
     try {
       if (!this.apiKey || !this.clientId) {
+        const errorMsg = 'ETA API credentials not configured - cannot submit in production'
+        logger.error('ETA submission blocked - missing credentials', {
+          invoiceNumber: invoice.invoiceNumber,
+          environment: process.env.NODE_ENV,
+        })
+
+        // In production, fail loudly
+        if (process.env.NODE_ENV === 'production') {
+          throw new Error(errorMsg)
+        }
+
         return {
           success: false,
-          message: 'ETA API credentials not configured',
+          message: errorMsg,
           errors: [
             {
               code: 'CONFIG_ERROR',
@@ -178,19 +196,18 @@ export class ETAAdapter implements EInvoicingProvider {
         }
       }
 
-      // TODO: In production, make actual API call to ETA
-      // For now, return mock response
-      logger.info('ETA submission initiated', {
+      logger.warn('ETA submission: Using mock implementation - integrate with real ETA API for production', {
         invoiceNumber: invoice.invoiceNumber,
         standard: this.standard,
+        environment: process.env.NODE_ENV,
       })
 
-      // Generate ETA UUID (would be assigned by actual ETA system)
+      // Generate mock ETA UUID (would be assigned by actual ETA system)
       const etaUuid = `ETA-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
 
       return {
         success: true,
-        message: 'Invoice submitted to ETA',
+        message: 'Invoice submitted to ETA (mock)',
         etaUuid: etaUuid,
         submissionTime: new Date(),
       }
