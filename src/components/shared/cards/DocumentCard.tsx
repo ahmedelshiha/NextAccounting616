@@ -191,10 +191,10 @@ export default function DocumentCard({
 
         {/* Metadata */}
         <div className="space-y-2 text-sm text-gray-600">
-          {document.uploadedBy && (
+          {document.uploader && (
             <div>
               <p className="text-xs font-medium text-gray-500">Uploaded by</p>
-              <p>{document.uploadedBy.name}</p>
+              <p>{document.uploader.name || 'Unknown'}</p>
             </div>
           )}
           {uploadedDate && (
