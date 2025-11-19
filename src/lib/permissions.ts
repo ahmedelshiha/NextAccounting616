@@ -147,13 +147,7 @@ export const PERMISSIONS = {
   BOOKINGS_DELETE: 'bookings.delete',
 
   // Tasks Management (entity-level)
-  TASKS_EDIT: 'tasks.edit',
-  TASKS_DELETE: 'tasks.delete',
   TASKS_UPDATE_OWN: 'tasks.update.own',
-
-  // Services Management (entity-level)
-  SERVICES_EDIT: 'services.edit',
-  SERVICES_DELETE: 'services.delete',
 } as const
 
 export type Permission = (typeof PERMISSIONS)[keyof typeof PERMISSIONS]
