@@ -116,6 +116,9 @@ model User {
   approvalsToApprove        Approval[]              @relation("ApprovalApprover")
   approvalsDecided          Approval[]              @relation("ApprovalDecider")
   approvalHistoryActions    ApprovalHistory[]       @relation("ApprovalHistoryPerformer")
+  notificationsReceived     Notification[]          @relation("NotificationsReceived")
+  notificationsSent         Notification[]          @relation("NotificationsSent")
+  notificationPreferences   NotificationPreference? @relation("NotificationPreferences")
 
   @@unique([tenantId, email])
   @@index([tenantId, role])
