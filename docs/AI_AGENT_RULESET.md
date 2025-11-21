@@ -73,30 +73,86 @@ All model fields referenced in the frontend or backend must exist in Prisma sche
 
 ---
 
-# 3. API Handler Signature Rules
+# 3. API Handler Signature Rules — CRITICAL FIX (Phase 1)
 
-All API route handlers must use the **standardized** signature:
+## Root Cause Discovery (Session Finding)
 
+**CRITICAL FINDING**: All 40+ API handler signature errors stem from handlers expecting **3 arguments** when middleware only passes **2 arguments**.
+
+### Current (WRONG) Pattern:
 ```ts
-export const GET = withMiddleware(async (
+// ❌ WRONG - expects 3 args
+export const GET = withTenantContext(async (
   request,
-  { user, tenantId, params }
+  { tenantId, user },  // ← These don't exist here!
+  { params }           // ← Middleware only passes THIS
 ) => { ... })
+```
+
+### Correct Pattern:
+```ts
+// ✅ CORRECT - expects 2 args
+export const GET = withTenantContext(async (
+  request,
+  { params }  // ← Only argument from middleware
+) => {
+  // Then inside handler, retrieve tenant context:
+  const { user, tenantId } = requireTenantContext()
+
+  // Now use them:
+  const id = (await params).id
+  // ... handler code
+})
+```
+
+### Middleware Truth (from src/lib/api-wrapper.ts:300):
+The actual middleware call is:
+```ts
+res = await tenantContext.run(context, () => handler(request, routeContext))
+// routeContext = { params }
+// handler receives ONLY: (request, { params })
 ```
 
 ### Forbidden:
 
-❌ `context.params.user`
-❌ `context.params.tenantId`
-❌ Handler receiving only two arguments
+❌ Handler with 3+ parameters
+❌ `context.params.user` - doesn't exist
+❌ `context.params.tenantId` - doesn't exist
+❌ Accessing user/tenantId from destructured context parameters
 
 ### Required:
 
-✔ Uniform signature across all 40+ API routes
-✔ Same pattern for GET, POST, PUT, DELETE
-✔ Correct **destructuring of tenant context** using `requireTenantContext()` whenever tenant-specific context is needed
+✔ **ALL handlers use 2-argument signature**: `async (request, { params })`
+✔ **Call `requireTenantContext()` inside handler** to get user and tenantId
+✔ **Properly `await params`** before accessing param values
+✔ Uniform pattern for GET, POST, PUT, DELETE
 
-**Note:** Explicit call to `requireTenantContext()` ensures the handler retrieves the tenant context properly. This is already implied by correct middleware usage but should be documented for clarity.
+### Critical Rules for Handler Fix:
+
+1. **Remove the middle parameter** from ALL handler signatures
+   - Before: `(request, { tenantId, user }, { params })`
+   - After: `(request, { params })`
+
+2. **Add `requireTenantContext()` call at handler start**
+   ```ts
+   const { user, tenantId } = requireTenantContext()
+   ```
+
+3. **Await params before using**
+   ```ts
+   const { id } = await params
+   ```
+
+4. **No changes to middleware wrappers** - they already work correctly
+
+### Files Affected by Phase 1 Fix (40+ files):
+
+**Pattern to search for**:
+```bash
+grep -r "async (request.*{ tenantId, user }.*{ params }" src/app/api --include="*.ts"
+```
+
+Each file matching this pattern needs the 3→2 argument transformation.
 
 ---
 
