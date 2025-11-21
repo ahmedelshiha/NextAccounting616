@@ -46,7 +46,7 @@ export const GET = withTenantContext(
               tenantId,
               OR: [
                 // Tasks created by the user
-                { createdBy: user.id },
+                { createdById: user.id },
                 // Tasks assigned to the user
                 { assigneeId: user.id },
               ],
