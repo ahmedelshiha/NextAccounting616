@@ -142,20 +142,33 @@ export class AuditLoggingService {
         changes: entry.changes,
       }
 
-      await prisma.auditLog.create({
-        data: {
-          action: entry.action,
-          userId: entry.userId,
-          tenantId: entry.tenantId,
-          resource: entry.resource,
-          ipAddress: entry.ipAddress,
-          userAgent: entry.userAgent,
-          metadata,
-        },
+      const data = this.formatAuditData({
+        action: entry.action,
+        userId: entry.userId,
+        tenantId: entry.tenantId,
+        resource: entry.resource,
+        ipAddress: entry.ipAddress,
+        userAgent: entry.userAgent,
+        metadata,
       })
+
+      await prisma.auditLog.create({ data })
     } catch (error) {
       logger.error('Failed to log audit event', {}, error instanceof Error ? error : new Error(String(error)))
       // Don't throw - audit logging failure shouldn't break the application
+    }
+  }
+
+  /**
+   * Create an audit log with automatic field mapping
+   * Handles both old (resourceType/resourceId) and new (resource) formats
+   */
+  static async createAuditLog(data: any): Promise<void> {
+    try {
+      const formatted = this.formatAuditData(data)
+      await prisma.auditLog.create({ data: formatted })
+    } catch (error) {
+      logger.error('Failed to create audit log', {}, error instanceof Error ? error : new Error(String(error)))
     }
   }
 
