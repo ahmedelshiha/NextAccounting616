@@ -170,7 +170,7 @@ export const PUT = withTenantContext(
           image: true,
           department: true,
           position: true,
-          ...(user.id === targetUserId && { phone: true }),
+          ...(userId === targetUserId && { phone: true }),
         },
       })
 
@@ -197,9 +197,9 @@ async function checkIfTeamMember(
     where: {
       tenantId,
       OR: [
-        { assigneeId: userId, createdBy: targetUserId },
-        { assigneeId: targetUserId, createdBy: userId },
-        { AND: [{ OR: [{ assigneeId: userId }, { createdBy: userId }] }, { OR: [{ assigneeId: targetUserId }, { createdBy: targetUserId }] }] },
+        { assigneeId: userId, createdById: targetUserId },
+        { assigneeId: targetUserId, createdById: userId },
+        { AND: [{ OR: [{ assigneeId: userId }, { createdById: userId }] }, { OR: [{ assigneeId: targetUserId }, { createdById: targetUserId }] }] },
       ],
     },
     select: { id: true },
@@ -212,8 +212,8 @@ async function checkIfTeamMember(
     where: {
       tenantId,
       OR: [
-        { clientId: userId, assignedToId: targetUserId },
-        { clientId: targetUserId, assignedToId: userId },
+        { clientId: userId, assignedTeamMemberId: { userId: targetUserId } },
+        { clientId: targetUserId, assignedTeamMemberId: { userId: userId } },
       ],
     },
     select: { id: true },
