@@ -35,8 +35,8 @@ function FinancialSettingsContent() {
     } finally { setLoading(false) }
   }
 
-  function onChange(section: string, field: string, value: any){
-    setPending((prev: any) => ({ ...prev, [section]: { ...(prev[section]||{}), [field]: value } }))
+  function onChange(section: string, field: string, value: unknown){
+    setPending((prev: Record<string, unknown>) => ({ ...prev, [section]: { ...(prev[section] as Record<string, unknown>)||{}, [field]: value } }))
   }
 
   async function onSave(){
